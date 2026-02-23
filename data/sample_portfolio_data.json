@@ -1,0 +1,114 @@
+{
+  "name": "Atharva Gaikwad",
+  "title": "Software Engineer & Full-Stack Developer",
+  "tagline": "Building innovative digital experiences with modern technologies. Specializing in mobile development, web applications, and blockchain solutions.",
+  "about": "I'm a Software Engineer currently pursuing my Master's in Computer Science at Syracuse University. With a strong foundation in mobile and web development, I specialize in creating performant, user-centric applications that solve real-world problems. My journey spans from building enterprise Android applications at Cerence AI to leading frontend development for impactful platforms. I'm passionate about exploring emerging technologies like blockchain and AI to create innovative solutions. When I'm not coding, you'll find me participating in hackathons, contributing to open-source, or exploring the latest in tech. I believe in continuous learning and pushing the boundaries of what's possible with code.",
+  "portfolio_url": "https://atharvagaikwad03.github.io",
+  "stats": {
+    "years_experience": "2+",
+    "projects_built": "10+",
+    "hackathon_prizes": "1"
+  },
+  "experience": [
+    {
+      "company": "iConsult Collaborative",
+      "role": "Software Developer Engineer",
+      "location": "Syracuse University",
+      "duration": "Oct 2024 - Jul 2025",
+      "highlights": [
+        "Translated Figma prototypes into production-ready interfaces, integrating APIs and CI/CD pipelines",
+        "Designed modular, reusable UI components achieving 25% improvement in responsiveness across web and mobile platforms",
+        "Led front-end development for Yoga4Philly's platform using React.js and Angular, optimizing performance through Agile sprints"
+      ],
+      "tech": ["React.js", "Angular", "Figma", "CI/CD", "Agile"]
+    },
+    {
+      "company": "Cerence AI",
+      "role": "Software Engineer",
+      "location": "",
+      "duration": "Jan 2023 - Jul 2024",
+      "highlights": [
+        "Prototyped Roku BrightScript modules for cross-platform streaming capabilities",
+        "Enhanced app functionality by 20% using OkHttp, Dagger, and Retrofit for REST API handling",
+        "Engineered Firebase and RoomDB solutions, improving real-time data retrieval by 35%",
+        "Applied MediaBrowserService for media playback integration, cutting download times by 30%"
+      ],
+      "tech": ["Android", "Firebase", "RoomDB", "Retrofit", "Dagger", "BrightScript"]
+    },
+    {
+      "company": "Cerence AI",
+      "role": "Software Engineer Intern",
+      "location": "",
+      "duration": "May 2022 - Jan 2023",
+      "highlights": [
+        "Contributed to improving app stability, reducing issue resolution time by 15% during testing cycles",
+        "Documented standard procedures and supported cross-team communication during sprints",
+        "Assisted in mobile app feature development leveraging Roku BrightScript for TV-based interfaces"
+      ],
+      "tech": ["Mobile Development", "BrightScript", "QA", "Documentation"]
+    }
+  ],
+  "skills": {
+    "programming_languages": ["Python", "Java", "JavaScript", "TypeScript", "Kotlin", "C++", "HTML/CSS", "Solidity", "SQL"],
+    "frameworks": ["React.js", "Angular", "Node.js", "Flask", "Django", "Express.js", "Socket.io"],
+    "cloud_devops": ["AWS", "Google Cloud", "Firebase", "Docker", "CI/CD", "Git"],
+    "databases": ["MongoDB", "PostgreSQL", "Firebase Realtime DB", "RoomDB"],
+    "mobile_development": ["Android Studio", "Xcode", "React Native", "Roku SDK"],
+    "tools_practices": ["VS Code", "Postman", "UI/UX Design", "Unit Testing", "Agile/Scrum"]
+  },
+  "projects": [
+    {
+      "name": "Free Flow",
+      "award": "ETHGlobal New York 2025 - Flow Builder Pool Prize Winner",
+      "description": "Free Flow transports users to an interactive 2D multiplayer virtual environment inspired by the iconic New York skyline. This project creates a gamified social space where users can explore, interact in real-time, and engage seamlessly with decentralized applications and blockchain functionalities. It bridges gaming, social platforms, and the decentralized web, offering a novel way to experience DeFi on the Flow blockchain.",
+      "features": [
+        "Real-time multiplayer synchronization with Socket.io, team formation, and unique room codes",
+        "NYC skyscraper-themed interactive 2D environment with DeFi agent interaction points",
+        "AI-Powered DeFi using GOAT SDK + OpenAI for natural language blockchain interactions",
+        "Voice integration with speech recognition + ElevenLabs TTS for immersive audio",
+        "Smart contracts on Flow blockchain for secure tokenized transactions",
+        "Ambient soundscapes and NYC-themed character graphics"
+      ],
+      "links": {
+        "ethglobal": "https://ethglobal.com/showcase/free-flow-u3xg9",
+        "github": "https://github.com/atharvagaikwad03"
+      }
+    },
+    {
+      "name": "AI Portfolio Copilot",
+      "description": "A multi-agent autonomous chatbot for personal website using Python, LangChain, and Pinecone. Features RAG architecture, real-time tool calling, and multi-agent collaboration.",
+      "tech_stack": ["Python", "LangChain", "Pinecone", "Node.js", "FastAPI"],
+      "metrics": {
+        "user_engagement_increase": "30%",
+        "bounce_rate_reduction": "20%",
+        "query_response_time_reduction": "40%",
+        "information_relevance_improvement": "25%",
+        "intent_recognition_accuracy": "95%"
+      }
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.S. Computer Science",
+      "institution": "Syracuse University",
+      "location": "Syracuse, New York",
+      "graduation": "Expected May 2026",
+      "gpa": "3.7/4.0",
+      "coursework": ["Computer Architecture", "Operating Systems", "Database Management", "Mobile App Programming", "Design & Analysis of Algorithms", "Natural Language Processing", "Internet of Things"]
+    },
+    {
+      "degree": "B.Tech Information Technology",
+      "institution": "University of Pune",
+      "location": "India",
+      "graduation": "May 2023",
+      "gpa": "3.4/4.0",
+      "coursework": ["Engineering Mathematics", "Cloud Computing", "Data Structures & Algorithms", "Web Development"]
+    }
+  ],
+  "contact": {
+    "email": "atgaikwa@syr.edu",
+    "linkedin": "https://www.linkedin.com/in/atharvagaikwad3/",
+    "github": "https://github.com/atharvagaikwad03",
+    "portfolio": "https://atharvagaikwad03.github.io"
+  }
+}
