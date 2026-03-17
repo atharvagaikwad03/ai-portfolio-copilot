@@ -77,7 +77,21 @@ GUIDELINES:
         except Exception:
             return {}
 
-    def _fallback_response(self, user_input: str, error: str) -> str:
+    def _should_answer_locally(self, user_input: str) -> bool:
+        """Use local portfolio data for common site-chat questions."""
+        query = user_input.lower()
+        local_tokens = [
+            "hello", "hi", "hey", "good morning", "good evening",
+            "who are you", "who is atharva", "tell me about yourself", "tell me about atharva",
+            "project", "free flow", "portfolio copilot", "built",
+            "skill", "tech", "stack", "language", "framework",
+            "experience", "work", "company", "intern", "job",
+            "education", "degree", "university", "gpa", "study",
+            "contact", "email", "linkedin", "github", "reach",
+        ]
+        return any(token in query for token in local_tokens)
+
+    def _fallback_response(self, user_input: str) -> str:
         """Generate a deterministic response when LLM calls fail."""
         query = user_input.lower()
         data = self.portfolio_data or {}
@@ -88,9 +102,14 @@ GUIDELINES:
         education = data.get("education", [])
         skills = data.get("skills", {})
 
+        if any(k in query for k in ["hello", "hi", "hey", "good morning", "good evening"]):
+            return (
+                f"Hi, I'm the portfolio copilot for {name}. "
+                "You can ask about projects, skills, experience, education, or contact details."
+            )
+
         if any(k in query for k in ["contact", "email", "linkedin", "github", "reach"]):
             return (
-                f"I am currently in offline fallback mode (reason: {error}).\n\n"
                 f"You can contact {name} here:\n"
                 f"- Email: {contact.get('email', 'N/A')}\n"
                 f"- LinkedIn: {contact.get('linkedin', 'N/A')}\n"
@@ -99,20 +118,20 @@ GUIDELINES:
             )
 
         if any(k in query for k in ["project", "portfolio copilot", "free flow", "built"]):
-            lines = [f"I am currently in offline fallback mode (reason: {error}).", "", f"{name}'s key projects:"]
+            lines = [f"{name}'s key projects:"]
             for project in projects[:3]:
                 desc = project.get("description", "")
                 lines.append(f"- {project.get('name', 'Project')}: {desc}")
             return "\n".join(lines)
 
         if any(k in query for k in ["experience", "work", "company", "intern"]):
-            lines = [f"I am currently in offline fallback mode (reason: {error}).", "", f"{name}'s experience:"]
+            lines = [f"{name}'s experience:"]
             for exp in experience[:3]:
                 lines.append(f"- {exp.get('role', 'Role')} at {exp.get('company', 'Company')} ({exp.get('duration', 'N/A')})")
             return "\n".join(lines)
 
         if any(k in query for k in ["education", "degree", "university", "gpa", "study"]):
-            lines = [f"I am currently in offline fallback mode (reason: {error}).", "", f"{name}'s education:"]
+            lines = [f"{name}'s education:"]
             for edu in education:
                 lines.append(
                     f"- {edu.get('degree', 'Degree')} at {edu.get('institution', 'Institution')} "
@@ -128,7 +147,7 @@ GUIDELINES:
                 "databases": "Databases",
                 "mobile_development": "Mobile",
             }
-            lines = [f"I am currently in offline fallback mode (reason: {error}).", "", f"{name}'s skills include:"]
+            lines = [f"{name}'s skills include:"]
             for key, label in categories.items():
                 items = skills.get(key, [])
                 if items:
@@ -136,7 +155,6 @@ GUIDELINES:
             return "\n".join(lines)
 
         return (
-            f"I am currently in offline fallback mode (reason: {error}).\n\n"
             f"{name} is a {data.get('title', 'Software Engineer')} with {data.get('stats', {}).get('years_experience', '2+')} years of experience, "
             f"and has built {data.get('stats', {}).get('projects_built', '10+')} projects. "
             f"You can ask about projects, skills, experience, education, or contact details."
@@ -144,6 +162,18 @@ GUIDELINES:
     
     def process(self, user_input: str, context: Optional[Dict] = None) -> Dict[str, Any]:
         """Generate response based on query and retrieved context."""
+        if self._should_answer_locally(user_input):
+            response_text = self._fallback_response(user_input)
+            self.add_to_history(user_input, response_text)
+            return {
+                "agent": self.name,
+                "response": response_text,
+                "query": user_input,
+                "used_context": False,
+                "success": True,
+                "fallback_used": True,
+            }
+
         if context and context.get("formatted_context"):
             prompt = f"""User Query: {user_input}
 
@@ -172,7 +202,7 @@ Generate a helpful response about Atharva based on the query. Use the portfolio 
                 "success": True
             }
         except Exception as e:
-            fallback = self._fallback_response(user_input, str(e))
+            fallback = self._fallback_response(user_input)
             return {
                 "agent": self.name,
                 "response": fallback,

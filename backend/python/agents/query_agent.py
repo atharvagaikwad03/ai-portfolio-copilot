@@ -28,9 +28,70 @@ Respond with a JSON object containing:
             system_prompt=system_prompt,
             temperature=0.3  # Lower temperature for more consistent intent recognition
         )
+
+    def _fallback_analysis(self, user_input: str) -> Dict[str, Any]:
+        """Classify common portfolio questions without the LLM."""
+        query = user_input.lower()
+
+        if any(token in query for token in ["hello", "hi", "hey", "good morning", "good evening"]):
+            intent = "greeting"
+            query_type = "conversational"
+        elif any(token in query for token in ["who are you", "who is atharva", "tell me about yourself", "tell me about atharva"]):
+            intent = "profile_summary"
+            query_type = "general"
+        elif any(token in query for token in ["project", "free flow", "portfolio copilot", "built"]):
+            intent = "project_inquiry"
+            query_type = "project-related"
+        elif any(token in query for token in ["skill", "tech", "stack", "language", "framework"]):
+            intent = "skills_inquiry"
+            query_type = "factual"
+        elif any(token in query for token in ["experience", "work", "company", "intern", "job"]):
+            intent = "experience_inquiry"
+            query_type = "factual"
+        elif any(token in query for token in ["education", "degree", "university", "gpa", "study"]):
+            intent = "education_inquiry"
+            query_type = "factual"
+        elif any(token in query for token in ["contact", "email", "linkedin", "github", "reach"]):
+            intent = "contact_inquiry"
+            query_type = "factual"
+        else:
+            intent = "information_request"
+            query_type = "general"
+
+        entities = []
+        for token in ["free flow", "ai portfolio copilot", "react", "python", "cerence ai", "syracuse university"]:
+            if token in query:
+                entities.append(token)
+
+        return {
+            "agent": self.name,
+            "intent": intent,
+            "entities": entities,
+            "requires_retrieval": False,
+            "query_type": query_type,
+            "confidence": 0.75,
+            "original_query": user_input,
+        }
+
+    def _should_use_local_classification(self, user_input: str) -> bool:
+        """Short-circuit obvious portfolio questions to avoid unnecessary LLM calls."""
+        query = user_input.lower()
+        local_tokens = [
+            "hello", "hi", "hey", "good morning", "good evening",
+            "who are you", "who is atharva", "tell me about yourself", "tell me about atharva",
+            "project", "free flow", "portfolio copilot", "built",
+            "skill", "tech", "stack", "language", "framework",
+            "experience", "work", "company", "intern", "job",
+            "education", "degree", "university", "gpa", "study",
+            "contact", "email", "linkedin", "github", "reach",
+        ]
+        return any(token in query for token in local_tokens)
     
     def process(self, user_input: str, context: Optional[Dict] = None) -> Dict[str, Any]:
         """Process query and extract intent."""
+        if self._should_use_local_classification(user_input):
+            return self._fallback_analysis(user_input)
+
         messages = self._build_messages(
             f"Analyze this user query: {user_input}\n\nProvide your analysis as JSON."
         )
@@ -61,14 +122,6 @@ Respond with a JSON object containing:
                 "original_query": user_input
             }
         except Exception as e:
-            # Fallback response
-            return {
-                "agent": self.name,
-                "intent": "information_request",
-                "entities": [],
-                "requires_retrieval": True,
-                "query_type": "general",
-                "confidence": 0.5,
-                "original_query": user_input,
-                "error": str(e)
-            }
+            fallback = self._fallback_analysis(user_input)
+            fallback["error"] = str(e)
+            return fallback
