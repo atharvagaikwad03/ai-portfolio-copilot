@@ -1,6 +1,7 @@
 """Response agent for generating contextual responses."""
 from typing import Dict, Optional, Any
 import json
+import re
 from pathlib import Path
 from agents.base_agent import BaseAgent
 
@@ -48,7 +49,11 @@ EDUCATION:
 - B.Tech Information Technology, University of Pune (May 2023, GPA 3.4/4.0)
 
 CONTACT:
-- Email: atgaikwa@syr.edu
+- Email: gaikwadatharva394@gmail.com
+- Phone: +1 (315) 575-8511
+- Address: 1020 Westcott St, Syracuse, New York 13210
+- Visa Status: F1 OPT
+- Sponsorship: Sponsorship needed in future after end of STEM Extension
 - LinkedIn: linkedin.com/in/atharvagaikwad3/
 - GitHub: github.com/atharvagaikwad03
 - Portfolio: atharvagaikwad03.github.io
@@ -77,6 +82,10 @@ GUIDELINES:
         except Exception:
             return {}
 
+    def _contains_any(self, query: str, terms: list[str]) -> bool:
+        """Match whole words/phrases to avoid accidental substring hits."""
+        return any(re.search(rf"\b{re.escape(term)}\b", query) for term in terms)
+
     def _should_answer_locally(self, user_input: str) -> bool:
         """Use local portfolio data for common site-chat questions."""
         query = user_input.lower()
@@ -88,8 +97,10 @@ GUIDELINES:
             "experience", "work", "company", "intern", "job",
             "education", "degree", "university", "gpa", "study",
             "contact", "email", "linkedin", "github", "reach",
+            "phone", "cell", "number", "call", "address", "location",
+            "visa", "opt", "sponsorship", "stem extension", "work authorization",
         ]
-        return any(token in query for token in local_tokens)
+        return self._contains_any(query, local_tokens)
 
     def _fallback_response(self, user_input: str) -> str:
         """Generate a deterministic response when LLM calls fail."""
@@ -102,35 +113,87 @@ GUIDELINES:
         education = data.get("education", [])
         skills = data.get("skills", {})
 
-        if any(k in query for k in ["hello", "hi", "hey", "good morning", "good evening"]):
+        if self._contains_any(query, ["hello", "hi", "hey", "good morning", "good evening"]):
             return (
                 f"Hi, I'm the portfolio copilot for {name}. "
                 "You can ask about projects, skills, experience, education, or contact details."
             )
 
-        if any(k in query for k in ["contact", "email", "linkedin", "github", "reach"]):
+        if self._contains_any(query, ["linkedin"]):
+            return (
+                f"You can view {name}'s LinkedIn here:\n"
+                f"{contact.get('linkedin', 'N/A')}"
+            )
+
+        if self._contains_any(query, ["github"]):
+            return (
+                f"You can view {name}'s GitHub here:\n"
+                f"{contact.get('github', 'N/A')}"
+            )
+
+        if self._contains_any(query, ["portfolio"]) and not self._contains_any(query, ["portfolio copilot", "project"]):
+            return (
+                f"You can view {name}'s portfolio here:\n"
+                f"{contact.get('portfolio', data.get('portfolio_url', 'N/A'))}"
+            )
+
+        if self._contains_any(query, ["email", "mail"]):
+            return (
+                f"You can reach {name} by email here:\n"
+                f"{contact.get('email', 'N/A')}"
+            )
+
+        if self._contains_any(query, ["phone", "cell", "number", "call"]):
+            return (
+                f"You can reach {name} by phone here:\n"
+                f"{contact.get('phone', 'N/A')}"
+            )
+
+        if self._contains_any(query, ["address", "location", "where are you located", "where are you based"]):
+            return (
+                f"{name}'s address is:\n"
+                f"{contact.get('address', 'N/A')}"
+            )
+
+        if self._contains_any(query, ["visa", "opt", "work authorization"]):
+            return (
+                f"{name}'s visa status is:\n"
+                f"{contact.get('visa_status', 'N/A')}"
+            )
+
+        if self._contains_any(query, ["sponsorship", "stem extension"]):
+            return (
+                f"Sponsorship details for {name}:\n"
+                f"{contact.get('sponsorship', 'N/A')}"
+            )
+
+        if self._contains_any(query, ["contact", "email", "linkedin", "github", "reach"]):
             return (
                 f"You can contact {name} here:\n"
                 f"- Email: {contact.get('email', 'N/A')}\n"
+                f"- Phone: {contact.get('phone', 'N/A')}\n"
+                f"- Address: {contact.get('address', 'N/A')}\n"
+                f"- Visa Status: {contact.get('visa_status', 'N/A')}\n"
+                f"- Sponsorship: {contact.get('sponsorship', 'N/A')}\n"
                 f"- LinkedIn: {contact.get('linkedin', 'N/A')}\n"
                 f"- GitHub: {contact.get('github', 'N/A')}\n"
                 f"- Portfolio: {contact.get('portfolio', data.get('portfolio_url', 'N/A'))}"
             )
 
-        if any(k in query for k in ["project", "portfolio copilot", "free flow", "built"]):
+        if self._contains_any(query, ["project", "portfolio copilot", "free flow", "built"]):
             lines = [f"{name}'s key projects:"]
             for project in projects[:3]:
                 desc = project.get("description", "")
                 lines.append(f"- {project.get('name', 'Project')}: {desc}")
             return "\n".join(lines)
 
-        if any(k in query for k in ["experience", "work", "company", "intern"]):
+        if self._contains_any(query, ["experience", "work", "company", "intern"]):
             lines = [f"{name}'s experience:"]
             for exp in experience[:3]:
                 lines.append(f"- {exp.get('role', 'Role')} at {exp.get('company', 'Company')} ({exp.get('duration', 'N/A')})")
             return "\n".join(lines)
 
-        if any(k in query for k in ["education", "degree", "university", "gpa", "study"]):
+        if self._contains_any(query, ["education", "degree", "university", "gpa", "study"]):
             lines = [f"{name}'s education:"]
             for edu in education:
                 lines.append(
@@ -139,7 +202,7 @@ GUIDELINES:
                 )
             return "\n".join(lines)
 
-        if any(k in query for k in ["skill", "tech", "stack", "language", "framework"]):
+        if self._contains_any(query, ["skill", "tech", "stack", "language", "framework"]):
             categories = {
                 "programming_languages": "Languages",
                 "frameworks": "Frameworks",

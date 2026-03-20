@@ -94,6 +94,16 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
+        .message-content a {
+            color: #2c5cff;
+            text-decoration: underline;
+            word-break: break-all;
+        }
+
+        .message.user .message-content a {
+            color: white;
+        }
+
         .message-meta {
             font-size: 11px;
             opacity: 0.7;
@@ -204,13 +214,29 @@
             }
         }
 
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function formatMessageHtml(text) {
+            const escaped = escapeHtml(text);
+            return escaped
+                .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
+                .replace(/\n/g, '<br>');
+        }
+
         function addMessage(text, isUser = false, metadata = null) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
             
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
-            contentDiv.textContent = text;
+            contentDiv.innerHTML = formatMessageHtml(text);
             
             if (metadata) {
                 const metaDiv = document.createElement('div');

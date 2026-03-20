@@ -6,7 +6,11 @@ from langchain_core.tools import tool
 PORTFOLIO_DATA = {
     "name": "Atharva Gaikwad",
     "title": "Software Engineer & Full-Stack Developer",
-    "email": "atgaikwa@syr.edu",
+    "email": "gaikwadatharva394@gmail.com",
+    "phone": "+1 (315) 575-8511",
+    "address": "1020 Westcott St, Syracuse, New York 13210",
+    "visa_status": "F1 OPT",
+    "sponsorship": "Sponsorship needed in the future after the end of STEM extension",
     "linkedin": "https://www.linkedin.com/in/atharvagaikwad3/",
     "github": "https://github.com/atharvagaikwad03",
     "portfolio": "https://atharvagaikwad03.github.io"
@@ -81,7 +85,11 @@ def get_contact_info() -> str:
     """Get Atharva's contact information and social media links."""
     return json.dumps({
         "name": "Atharva Gaikwad",
-        "email": "atgaikwa@syr.edu",
+        "email": "gaikwadatharva394@gmail.com",
+        "phone": "+1 (315) 575-8511",
+        "address": "1020 Westcott St, Syracuse, New York 13210",
+        "visa_status": "F1 OPT",
+        "sponsorship": "Sponsorship needed in the future after the end of STEM extension",
         "linkedin": "https://www.linkedin.com/in/atharvagaikwad3/",
         "github": "https://github.com/atharvagaikwad03",
         "portfolio": "https://atharvagaikwad03.github.io"
@@ -163,7 +171,9 @@ def format_portfolio_summary() -> str:
 - Skills: Python, Java, JavaScript, React.js, Angular, Node.js, Firebase, Android, Blockchain
 - Specializes in mobile development, web applications, and blockchain solutions
 - Portfolio: atharvagaikwad03.github.io
-- Email: atgaikwa@syr.edu"""
+- Email: gaikwadatharva394@gmail.com
+- Phone: +1 (315) 575-8511
+- Visa Status: F1 OPT"""
 
 
 portfolio_tools = [get_project_info, search_skills, get_contact_info, get_experience_info, get_education_info, format_portfolio_summary]

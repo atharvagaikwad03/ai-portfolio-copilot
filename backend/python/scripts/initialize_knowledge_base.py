@@ -92,6 +92,10 @@ Coursework: {coursework}""",
     documents.append(Document(
         page_content=f"""Contact Information for {data['name']}:
 Email: {contact.get('email', '')}
+Phone: {contact.get('phone', '')}
+Address: {contact.get('address', '')}
+Visa Status: {contact.get('visa_status', '')}
+Sponsorship: {contact.get('sponsorship', '')}
 LinkedIn: {contact.get('linkedin', '')}
 GitHub: {contact.get('github', '')}
 Portfolio: {contact.get('portfolio', '')}""",

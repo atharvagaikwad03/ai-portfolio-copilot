@@ -2,6 +2,7 @@
 from typing import Dict, Optional, Any
 from agents.base_agent import BaseAgent
 import json
+import re
 
 
 class QueryAgent(BaseAgent):
@@ -29,30 +30,40 @@ Respond with a JSON object containing:
             temperature=0.3  # Lower temperature for more consistent intent recognition
         )
 
+    def _contains_any(self, query: str, terms: list[str]) -> bool:
+        """Match whole words/phrases to avoid accidental substring hits."""
+        return any(re.search(rf"\b{re.escape(term)}\b", query) for term in terms)
+
     def _fallback_analysis(self, user_input: str) -> Dict[str, Any]:
         """Classify common portfolio questions without the LLM."""
         query = user_input.lower()
 
-        if any(token in query for token in ["hello", "hi", "hey", "good morning", "good evening"]):
+        if self._contains_any(query, ["hello", "hi", "hey", "good morning", "good evening"]):
             intent = "greeting"
             query_type = "conversational"
-        elif any(token in query for token in ["who are you", "who is atharva", "tell me about yourself", "tell me about atharva"]):
+        elif self._contains_any(query, ["who are you", "who is atharva", "tell me about yourself", "tell me about atharva"]):
             intent = "profile_summary"
             query_type = "general"
-        elif any(token in query for token in ["project", "free flow", "portfolio copilot", "built"]):
+        elif self._contains_any(query, ["project", "free flow", "portfolio copilot", "built"]):
             intent = "project_inquiry"
             query_type = "project-related"
-        elif any(token in query for token in ["skill", "tech", "stack", "language", "framework"]):
+        elif self._contains_any(query, ["skill", "tech", "stack", "language", "framework"]):
             intent = "skills_inquiry"
             query_type = "factual"
-        elif any(token in query for token in ["experience", "work", "company", "intern", "job"]):
+        elif self._contains_any(query, ["experience", "work", "company", "intern", "job"]):
             intent = "experience_inquiry"
             query_type = "factual"
-        elif any(token in query for token in ["education", "degree", "university", "gpa", "study"]):
+        elif self._contains_any(query, ["education", "degree", "university", "gpa", "study"]):
             intent = "education_inquiry"
             query_type = "factual"
-        elif any(token in query for token in ["contact", "email", "linkedin", "github", "reach"]):
+        elif self._contains_any(query, ["contact", "email", "linkedin", "github", "reach"]):
             intent = "contact_inquiry"
+            query_type = "factual"
+        elif self._contains_any(query, ["phone", "cell", "number", "call", "address", "location"]):
+            intent = "contact_inquiry"
+            query_type = "factual"
+        elif self._contains_any(query, ["visa", "opt", "sponsorship", "stem extension", "work authorization"]):
+            intent = "work_authorization_inquiry"
             query_type = "factual"
         else:
             intent = "information_request"
@@ -84,8 +95,10 @@ Respond with a JSON object containing:
             "experience", "work", "company", "intern", "job",
             "education", "degree", "university", "gpa", "study",
             "contact", "email", "linkedin", "github", "reach",
+            "phone", "cell", "number", "call", "address", "location",
+            "visa", "opt", "sponsorship", "stem extension", "work authorization",
         ]
-        return any(token in query for token in local_tokens)
+        return self._contains_any(query, local_tokens)
     
     def process(self, user_input: str, context: Optional[Dict] = None) -> Dict[str, Any]:
         """Process query and extract intent."""

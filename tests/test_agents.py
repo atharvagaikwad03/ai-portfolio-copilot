@@ -109,5 +109,28 @@ def test_response_agent_local_fallback_hides_provider_errors(monkeypatch, respon
     assert "skills include" in result["response"]
 
 
+def test_response_agent_returns_direct_contact_links(response_agent):
+    """Test direct contact questions return direct URLs."""
+    result = response_agent.process("What is Atharva's LinkedIn?")
+
+    assert "https://www.linkedin.com/in/atharvagaikwad3/" in result["response"]
+
+
+def test_response_agent_returns_phone_number(response_agent):
+    """Test phone queries return the configured phone number."""
+    result = response_agent.process("What is Atharva's phone number?")
+
+    assert "+1 (315) 575-8511" in result["response"]
+
+
+def test_response_agent_returns_visa_and_sponsorship_details(response_agent):
+    """Test work authorization queries return visa and sponsorship details."""
+    visa_result = response_agent.process("What is Atharva's visa status?")
+    sponsorship_result = response_agent.process("Will Atharva need sponsorship?")
+
+    assert "F1 OPT" in visa_result["response"]
+    assert "STEM extension" in sponsorship_result["response"]
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
