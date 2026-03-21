@@ -47,10 +47,13 @@ Respond with a JSON object containing:
         elif self._contains_any(query, ["project", "free flow", "portfolio copilot", "built"]):
             intent = "project_inquiry"
             query_type = "project-related"
-        elif self._contains_any(query, ["skill", "tech", "stack", "language", "framework"]):
+        elif self._contains_any(query, ["skill", "skills", "tech", "stack", "language", "framework"]):
             intent = "skills_inquiry"
             query_type = "factual"
         elif self._contains_any(query, ["experience", "work", "company", "intern", "job"]):
+            intent = "experience_inquiry"
+            query_type = "factual"
+        elif self._contains_any(query, ["cerence", "cerence ai", "iconsult", "iconsult collaborative", "yoga4philly"]):
             intent = "experience_inquiry"
             query_type = "factual"
         elif self._contains_any(query, ["education", "degree", "university", "gpa", "study"]):
@@ -91,8 +94,9 @@ Respond with a JSON object containing:
             "hello", "hi", "hey", "good morning", "good evening",
             "who are you", "who is atharva", "tell me about yourself", "tell me about atharva",
             "project", "free flow", "portfolio copilot", "built",
-            "skill", "tech", "stack", "language", "framework",
+            "skill", "skills", "tech", "stack", "language", "framework",
             "experience", "work", "company", "intern", "job",
+            "cerence", "cerence ai", "iconsult", "iconsult collaborative", "yoga4philly",
             "education", "degree", "university", "gpa", "study",
             "contact", "email", "linkedin", "github", "reach",
             "phone", "cell", "number", "call", "address", "location",

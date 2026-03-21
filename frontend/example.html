@@ -3,8 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Portfolio Copilot - Demo</title>
+    <title>AI Portfolio Copilot</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter+Tight:wght@400;600&display=swap');
+
+        :root {
+            --bg: #0f1729;
+            --card: #0c1321;
+            --panel: #0a101c;
+            --primary: #7bd7ff;
+            --accent: #9c7bff;
+            --muted: #b8c2d8;
+            --stroke: rgba(255, 255, 255, 0.08);
+            --glow: rgba(123, 215, 255, 0.35);
+            --radius: 18px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,207 +26,301 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Space Grotesk', 'Inter Tight', sans-serif;
+            background: radial-gradient(circle at 20% 20%, rgba(123, 215, 255, 0.15), transparent 30%),
+                        radial-gradient(circle at 80% 10%, rgba(156, 123, 255, 0.18), transparent 28%),
+                        radial-gradient(circle at 50% 90%, rgba(123, 215, 255, 0.12), transparent 32%),
+                        var(--bg);
+            color: #f6f8ff;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 20px;
+            justify-content: center;
+            padding: 32px;
         }
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        .shell {
             width: 100%;
-            max-width: 800px;
-            height: 600px;
-            display: flex;
-            flex-direction: column;
+            max-width: 1080px;
+            min-height: 80vh;
+            background: linear-gradient(145deg, var(--card), var(--panel));
+            border: 1px solid var(--stroke);
+            border-radius: 24px;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45), 0 0 60px var(--glow);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
+            padding: 22px 24px;
+            border-bottom: 1px solid var(--stroke);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
         }
 
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
+        .hero {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
-        .header p {
-            opacity: 0.9;
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .subtitle {
+            color: var(--muted);
             font-size: 14px;
+            line-height: 1.4;
         }
 
-        .chat-container {
-            flex: 1;
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid var(--stroke);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 13px;
+            color: #d7e2ff;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.6);
+        }
+
+        .chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-self: center;
+        }
+
+        .chip {
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--stroke);
+            color: #dbe9ff;
+            cursor: pointer;
+            font-size: 13px;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+
+        .chip:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .chat {
+            padding: 18px 22px;
             overflow-y: auto;
-            padding: 20px;
-            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .message {
-            margin-bottom: 15px;
             display: flex;
-            animation: fadeIn 0.3s;
+            gap: 10px;
+            animation: fadeIn 0.25s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .message.bot {
+            align-items: flex-start;
         }
 
         .message.user {
             justify-content: flex-end;
         }
 
-        .message.bot {
-            justify-content: flex-start;
+        .bubble {
+            max-width: 72%;
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--stroke);
+            background: rgba(255, 255, 255, 0.04);
+            color: #e8efff;
+            line-height: 1.55;
+            font-size: 15px;
         }
 
-        .message-content {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 18px;
-            word-wrap: break-word;
+        .message.user .bubble {
+            background: linear-gradient(135deg, #74c8ff, #9c7bff);
+            color: #0a0f1c;
+            border: none;
+            box-shadow: 0 12px 30px rgba(116, 200, 255, 0.25);
         }
 
-        .message.user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .message.bot .message-content {
-            background: white;
-            color: #333;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .message-content a {
-            color: #2c5cff;
+        .bubble a {
+            color: #c8e7ff;
             text-decoration: underline;
             word-break: break-all;
         }
 
-        .message.user .message-content a {
-            color: white;
+        .message.user .bubble a {
+            color: #0a0f1c;
         }
 
-        .message-meta {
-            font-size: 11px;
-            opacity: 0.7;
-            margin-top: 5px;
+        .meta {
+            margin-top: 8px;
+            font-size: 12px;
+            opacity: 0.8;
         }
 
-        .input-container {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
-            display: flex;
+        .composer {
+            padding: 16px 18px;
+            border-top: 1px solid var(--stroke);
+            background: rgba(255, 255, 255, 0.02);
+            display: grid;
+            grid-template-columns: 1fr auto;
             gap: 10px;
         }
 
-        .input-container input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.3s;
+        .input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--stroke);
+            background: rgba(255, 255, 255, 0.03);
+            color: #f6f8ff;
+            font-size: 15px;
         }
 
-        .input-container input:focus {
-            border-color: #667eea;
+        .input:focus {
+            outline: 1px solid var(--primary);
+            box-shadow: 0 0 0 4px rgba(123, 215, 255, 0.14);
         }
 
-        .input-container button {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .send {
+            padding: 14px 18px;
+            border-radius: 14px;
             border: none;
-            border-radius: 25px;
+            background: linear-gradient(135deg, #74c8ff, #9c7bff);
+            color: #0a0f1c;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: transform 0.2s;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .input-container button:hover {
-            transform: scale(1.05);
+        .send:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 30px rgba(116, 200, 255, 0.28);
         }
 
-        .input-container button:disabled {
-            opacity: 0.5;
+        .send:disabled {
+            opacity: 0.55;
             cursor: not-allowed;
         }
 
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.35);
             border-radius: 50%;
-            border-top-color: white;
+            border-top-color: #0a0f1c;
             animation: spin 1s ease-in-out infinite;
+            vertical-align: middle;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        .error {
-            color: #e74c3c;
-            font-size: 12px;
-            margin-top: 5px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 720px) {
+            .shell {
+                min-height: 90vh;
+            }
+            .bubble {
+                max-width: 88%;
+            }
+            .header {
+                grid-template-columns: 1fr;
+            }
+            .chips {
+                justify-content: flex-start;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="shell">
         <div class="header">
-            <h1>🤖 AI Portfolio Copilot</h1>
-            <p>Ask me about projects, skills, and experience</p>
+            <div class="hero">
+                <div class="status">
+                    <span class="status-dot"></span>
+                    Live: AI Portfolio Copilot
+                </div>
+                <div class="title">Atharva Gaikwad · Software Engineer</div>
+                <div class="subtitle">
+                    Ask about projects, skills, contact info, location, visa status, or sponsorship. I’ll keep answers crisp and link out where useful.
+                </div>
+            </div>
+            <div class="chips" id="chips">
+                <button class="chip" data-text="Tell me about your projects">Projects</button>
+                <button class="chip" data-text="What is your LinkedIn?">LinkedIn</button>
+                <button class="chip" data-text="What is your phone number?">Phone</button>
+                <button class="chip" data-text="Will you need sponsorship?">Sponsorship</button>
+                <button class="chip" data-text="Summarize your skills">Skills</button>
+            </div>
         </div>
-        
-        <div class="chat-container" id="chatContainer">
+
+        <div class="chat" id="chatContainer">
             <div class="message bot">
-                <div class="message-content">
-                    Hello! I'm your AI Portfolio Copilot. Ask me about projects, skills, or experience!
+                <div class="bubble">
+                    Hello! I’m Atharva’s portfolio copilot. Ask about projects, skills, contact details, location, or visa status.
                 </div>
             </div>
         </div>
-        
-        <div class="input-container">
-            <input 
-                type="text" 
-                id="messageInput" 
-                placeholder="Type your message..."
-                onkeypress="handleKeyPress(event)"
+
+        <div class="composer">
+            <input
+                type="text"
+                id="messageInput"
+                class="input"
+                placeholder="Type a question... e.g. “What is your GitHub?”"
+                autocomplete="off"
             >
-            <button id="sendButton" onclick="sendMessage()">Send</button>
+            <button id="sendButton" class="send" onclick="sendMessage()">Send</button>
         </div>
     </div>
 
     <script>
-        // Relative URL so chat works when page is served from Node (e.g. http://localhost:3000/app/example.html)
         const API_URL = '/api/chat';
         const chatContainer = document.getElementById('chatContainer');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
+        const chips = document.getElementById('chips');
         let sessionId = 'session-' + Date.now();
 
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
                 sendMessage();
             }
-        }
+        });
+
+        chips.addEventListener('click', (event) => {
+            const chip = event.target.closest('.chip');
+            if (!chip) return;
+            messageInput.value = chip.dataset.text;
+            sendMessage();
+        });
 
         function escapeHtml(text) {
             return text
@@ -231,22 +339,22 @@
         }
 
         function addMessage(text, isUser = false, metadata = null) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.innerHTML = formatMessageHtml(text);
-            
+            const wrapper = document.createElement('div');
+            wrapper.className = `message ${isUser ? 'user' : 'bot'}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.innerHTML = formatMessageHtml(text);
+
             if (metadata) {
                 const metaDiv = document.createElement('div');
-                metaDiv.className = 'message-meta';
-                metaDiv.textContent = `Intent: ${metadata.intent} | Confidence: ${(metadata.confidence * 100).toFixed(0)}%`;
-                contentDiv.appendChild(metaDiv);
+                metaDiv.className = 'meta';
+                metaDiv.textContent = `Intent: ${metadata.intent} · Confidence: ${(metadata.confidence * 100).toFixed(0)}%`;
+                bubble.appendChild(metaDiv);
             }
-            
-            messageDiv.appendChild(contentDiv);
-            chatContainer.appendChild(messageDiv);
+
+            wrapper.appendChild(bubble);
+            chatContainer.appendChild(wrapper);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
@@ -254,7 +362,6 @@
             const message = messageInput.value.trim();
             if (!message) return;
 
-            // Add user message
             addMessage(message, true);
             messageInput.value = '';
             sendButton.disabled = true;
@@ -263,29 +370,19 @@
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        session_id: sessionId
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, session_id: sessionId })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
 
                 const data = await response.json();
-                
-                // Add bot response
                 addMessage(data.response, false, {
                     intent: data.intent,
                     confidence: data.confidence
                 });
-
             } catch (error) {
-                console.error('Error:', error);
+                console.error(error);
                 addMessage('Sorry, I encountered an error. Please make sure the backend is running.', false);
             } finally {
                 sendButton.disabled = false;

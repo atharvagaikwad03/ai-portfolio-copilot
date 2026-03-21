@@ -93,7 +93,7 @@ GUIDELINES:
             "hello", "hi", "hey", "good morning", "good evening",
             "who are you", "who is atharva", "tell me about yourself", "tell me about atharva",
             "project", "free flow", "portfolio copilot", "built",
-            "skill", "tech", "stack", "language", "framework",
+            "skill", "skills", "tech", "stack", "language", "framework",
             "experience", "work", "company", "intern", "job",
             "education", "degree", "university", "gpa", "study",
             "contact", "email", "linkedin", "github", "reach",
@@ -112,6 +112,57 @@ GUIDELINES:
         experience = data.get("experience", [])
         education = data.get("education", [])
         skills = data.get("skills", {})
+
+        def format_experience(company_query: str) -> Optional[str]:
+            for exp in experience:
+                company_name = exp.get("company", "")
+                if company_query in company_name.lower():
+                    highlights = exp.get("highlights", [])
+                    role = exp.get("role", "Role")
+                    duration = exp.get("duration", "Duration")
+                    lines = [f"{role} at {company_name} ({duration})"]
+                    for h in highlights[:4]:
+                        lines.append(f"- {h}")
+                    return "\n".join(lines)
+            return None
+
+        def format_projects() -> str:
+            if not projects:
+                return "No projects found."
+            lines = []
+            for project in projects:
+                name_line = project.get("name", "Project")
+                desc = project.get("description", "")
+                features = project.get("features", [])
+                links = project.get("links", {})
+                lines.append(name_line)
+                if desc:
+                    lines.append(f"  • {desc}")
+                if features:
+                    for f in features[:4]:
+                        lines.append(f"  - {f}")
+                if links:
+                    for label, url in links.items():
+                        lines.append(f"  - {label.title()} link: {url}")
+                lines.append("")
+            return "\n".join(lines).strip()
+
+        def format_skills() -> str:
+            if not skills:
+                return "No skills found."
+            ordered = [
+                ("Programming Languages", skills.get("programming_languages", [])),
+                ("Frameworks", skills.get("frameworks", [])),
+                ("Cloud/DevOps", skills.get("cloud_devops", [])),
+                ("Databases", skills.get("databases", [])),
+                ("Mobile", skills.get("mobile_development", [])),
+                ("Tools/Practices", skills.get("tools_practices", [])),
+            ]
+            lines = []
+            for label, items in ordered:
+                if items:
+                    lines.append(f"{label}: {', '.join(items)}")
+            return "\n".join(lines)
 
         if self._contains_any(query, ["hello", "hi", "hey", "good morning", "good evening"]):
             return (
@@ -167,6 +218,19 @@ GUIDELINES:
                 f"{contact.get('sponsorship', 'N/A')}"
             )
 
+        cerence_exp = format_experience("cerence")
+        iconsult_exp = format_experience("iconsult")
+        if self._contains_any(query, ["cerence", "cerence ai"]) and cerence_exp:
+            return cerence_exp
+        if self._contains_any(query, ["iconsult", "iconsult collaborative", "yoga4philly"]) and iconsult_exp:
+            return iconsult_exp
+
+        if self._contains_any(query, ["project", "portfolio copilot", "free flow", "built"]):
+            return format_projects()
+
+        if self._contains_any(query, ["skill", "skills", "tech", "stack", "language", "framework"]):
+            return format_skills()
+
         if self._contains_any(query, ["contact", "email", "linkedin", "github", "reach"]):
             return (
                 f"You can contact {name} here:\n"
@@ -179,13 +243,6 @@ GUIDELINES:
                 f"- GitHub: {contact.get('github', 'N/A')}\n"
                 f"- Portfolio: {contact.get('portfolio', data.get('portfolio_url', 'N/A'))}"
             )
-
-        if self._contains_any(query, ["project", "portfolio copilot", "free flow", "built"]):
-            lines = [f"{name}'s key projects:"]
-            for project in projects[:3]:
-                desc = project.get("description", "")
-                lines.append(f"- {project.get('name', 'Project')}: {desc}")
-            return "\n".join(lines)
 
         if self._contains_any(query, ["experience", "work", "company", "intern"]):
             lines = [f"{name}'s experience:"]
@@ -200,21 +257,6 @@ GUIDELINES:
                     f"- {edu.get('degree', 'Degree')} at {edu.get('institution', 'Institution')} "
                     f"({edu.get('graduation', 'N/A')}, GPA {edu.get('gpa', 'N/A')})"
                 )
-            return "\n".join(lines)
-
-        if self._contains_any(query, ["skill", "tech", "stack", "language", "framework"]):
-            categories = {
-                "programming_languages": "Languages",
-                "frameworks": "Frameworks",
-                "cloud_devops": "Cloud/DevOps",
-                "databases": "Databases",
-                "mobile_development": "Mobile",
-            }
-            lines = [f"{name}'s skills include:"]
-            for key, label in categories.items():
-                items = skills.get(key, [])
-                if items:
-                    lines.append(f"- {label}: {', '.join(items[:8])}")
             return "\n".join(lines)
 
         return (

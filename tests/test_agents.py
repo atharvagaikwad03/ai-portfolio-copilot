@@ -132,5 +132,16 @@ def test_response_agent_returns_visa_and_sponsorship_details(response_agent):
     assert "STEM extension" in sponsorship_result["response"]
 
 
+def test_response_agent_company_specific_experience(response_agent):
+    """Test company-specific experience answers are returned."""
+    cerence = response_agent.process("What did you do at Cerence?")
+    iconsult = response_agent.process("What are you doing at iConsult Collaborative?")
+
+    assert "Cerence" in cerence["response"]
+    assert "OkHttp" in cerence["response"] or "Firebase" in cerence["response"]
+    assert "iConsult Collaborative" in iconsult["response"]
+    assert "Yoga4Philly" in iconsult["response"] or "Figma" in iconsult["response"]
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
