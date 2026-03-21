@@ -1,16 +1,14 @@
 # AI Portfolio Copilot
 
-A multi-agent autonomous chatbot for personal websites built with Python, LangChain, Pinecone, and Node.js. This system provides intelligent conversational capabilities with RAG (Retrieval-Augmented Generation) architecture, real-time tool calling, and multi-agent collaboration.
+A conversational portfolio assistant for Atharva Gaikwad. Visitors can ask about projects, skills, experience, contact details, visa/sponsorship status, and get direct, linkable answers. The system uses a multi-agent Python backend with optional RAG, a Node.js gateway, and a lightweight chat UI.
 
-## Features
+## Current Highlights
 
-- 🤖 **Multi-Agent System**: Orchestrated autonomous agents using LangChain and LangGraph
-- 🔍 **RAG Architecture**: Pinecone vector database with custom embedding models
-- ⚡ **Real-Time Tool Calling**: Dynamic tool selection and execution
-- 🔄 **Multi-Agent Collaboration**: Coordinated workflows between specialized agents
-- 📊 **Evaluation Framework**: 95% accuracy in intent recognition and response quality
-- 🚀 **RESTful API**: Node.js backend for seamless integration
-- 📈 **Performance**: 40% reduction in query response time, 25% improvement in information relevance
+- Fast local answers for common portfolio questions (projects, skills, contact, address, visa/sponsorship, company-specific experience for Cerence and iConsult).
+- Multi-agent orchestration with optional LLM + retrieval; graceful fallback when the provider is unavailable.
+- Clickable LinkedIn/GitHub/portfolio links rendered in the chat UI.
+- Vector store uses local Chroma persistence (`data/chroma_db`); Pinecone is not required for local runs.
+- Modernized chat UI with quick-start chips for common prompts.
 
 ## Architecture
 
@@ -29,14 +27,15 @@ A multi-agent autonomous chatbot for personal websites built with Python, LangCh
          ▼
 ┌─────────────────┐
 │  Python Backend │
-│  (LangChain)    │
+│  (FastAPI +     │
+│   LangChain)    │
 └────────┬────────┘
          │
     ┌────┴────┐
     ▼         ▼
 ┌────────┐  ┌──────────┐
-│Pinecone│  │  Agents  │
-│Vector DB│  │ (Multi)  │
+│Chroma  │  │  Agents  │
+│Vector DB│ │ (Multi)  │
 └────────┘  └──────────┘
 ```
 
@@ -62,14 +61,13 @@ ai-portfolio-copilot/
 └── config/                  # Configuration files
 ```
 
-## Installation
+## Install & Run
 
 ### Prerequisites
 
 - Python 3.10+
 - Node.js 18+
-- Pinecone API key
-- OpenAI API key (or other LLM provider)
+- OpenAI API key (optional for local-only fallback; LLM features will be limited without it)
 
 ### Setup
 
@@ -79,24 +77,22 @@ git clone <repository-url>
 cd ai-portfolio-copilot
 ```
 
-2. **Python Backend Setup**
+2. **Python Backend Setup** (from repo root)
 ```bash
-cd backend/python
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. **Node.js Backend Setup**
+3. **Node.js Backend Setup** (from repo root)
 ```bash
-cd backend/nodejs
 npm install
 ```
 
 4. **Environment Configuration**
 ```bash
 cp .env.example .env
-# Edit .env with your API keys
+# Edit .env with your API key(s); for local-only fallback, OPENAI_API_KEY can be blank but LLM answers will be disabled.
 ```
 
 ## Configuration
@@ -105,13 +101,8 @@ Create a `.env` file in the root directory:
 
 ```env
 # LLM Configuration
-OPENAI_API_KEY=your_openai_api_key
-LLM_MODEL=gpt-4
-
-# Pinecone Configuration
-PINECONE_API_KEY=your_pinecone_api_key
-PINECONE_ENVIRONMENT=your_environment
-PINECONE_INDEX_NAME=portfolio-copilot
+OPENAI_API_KEY=your_openai_api_key   # optional for local-only fallback
+LLM_MODEL=gpt-4o-mini
 
 # Server Configuration
 PYTHON_API_PORT=8000
@@ -124,17 +115,21 @@ EVAL_THRESHOLD=0.95
 
 ## Usage
 
-### Start Python Backend
+### Start Python Backend (terminal 1)
 ```bash
+cd /Users/atharvagaikwad/ai-portfolio-copilot
+source venv/bin/activate
 cd backend/python
 python -m api.server
 ```
 
-### Start Node.js API
+### Start Node.js API (terminal 2)
 ```bash
-cd backend/nodejs
 npm start
 ```
+
+### Chat UI
+Open `http://localhost:3000/app/example.html` in your browser.
 
 ### Example API Request
 ```bash
@@ -155,11 +150,13 @@ The system uses specialized agents:
 - **Response Agent**: Generates contextual responses
 - **Evaluation Agent**: Monitors and evaluates response quality
 
+Common portfolio questions (projects, skills, contact info, address, visa/sponsorship, company-specific experience for Cerence and iConsult) are answered locally without LLM calls for speed and reliability.
+
 ## RAG Architecture
 
 1. **Document Ingestion**: Documents are processed and chunked
-2. **Embedding Generation**: Custom embeddings created using fine-tuned models
-3. **Vector Storage**: Embeddings stored in Pinecone
+2. **Embedding Generation**: Custom embeddings via LangChain
+3. **Vector Storage**: Embeddings stored in local Chroma (`data/chroma_db`)
 4. **Retrieval**: Semantic search retrieves relevant context
 5. **Generation**: LLM generates responses using retrieved context
 
